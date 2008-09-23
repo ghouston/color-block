@@ -60,7 +60,12 @@ module Windows::ColorConsole
     new_color = (background.nil?) ? foreground : foreground + (background * 16)
     SetConsoleTextAttribute( @__color_console_handle, new_color )
     if block_given? then
-      yield
+      begin
+        yield
+      rescue
+        SetConsoleTextAttribute( @__color_console_handle, prior_color )
+        raise # rethrow the exception
+      end
       SetConsoleTextAttribute( @__color_console_handle, prior_color )
     end
   end

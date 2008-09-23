@@ -1,11 +1,11 @@
 = color-console
-  by Gregory N. Houston
+  by Greg Houston
 
 color-console is a ruby library which makes it easy to output color text.  right now
 it only supports windows.  (maybe someone on linux and mac would like to add support
 for those platforms.)
 
-Version:: 0.1.0
+Version:: 0.1.1
 
 == LICENSE:
 
@@ -52,3 +52,11 @@ puts "now everything is white on blue!"
 color_restore
 
 puts "color-console remembers the original color so it can be restored!"
+
+== History:
+
+0.1.1 Sep 23, 2003 => Fix, restores color when an exception is thrown within a block 
+argument to Windows::ColorConsole#color.  Added examples to demonstrate exception
+handling.
+
+0.1.0 Aug 22, 2008 => Initial release.
