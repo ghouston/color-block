@@ -37,13 +37,14 @@ dealings in this Software without prior written authorization.
 
 == Examples:
 
-include 'color-console'
+require 'color-console'
+include Windows::ColorConsole
+
+color( BLUE ) { "everything in this block is blue!" }
 
 putsc RED, "putsc adds a color argument to puts"
 
 putsc [WHITE,DARK_GREEN], "foreground and background are specified with an array"
-
-color( BLUE ) { "everything in this block is blue!" }
 
 color( WHITE, BLUE )
 
