@@ -1,11 +1,11 @@
-= color-console
+= color-block
   by Greg Houston
 
-color-console is a ruby library which makes it easy to output color text.  right now
-it only supports windows.  (maybe someone on linux and mac would like to add support
-for those platforms.)
+I wanted to color the output of Rake.  The problem is I dont have direct access to the
+strings contained in rake tasks.  The solution is to wrap code in a block that colors the
+output of everything inside the block.
 
-Version:: 0.1.1
+Version:: 0.2.0
 
 == LICENSE:
 
@@ -37,26 +37,45 @@ dealings in this Software without prior written authorization.
 
 == Examples:
 
-require 'color-console'
-include Windows::ColorConsole
+require 'color-block'
+include ColorBlock
 
-color( BLUE ) { "everything in this block is blue!" }
+color( :blue ) { "everything in this block is blue!" }
 
-putsc RED, "putsc adds a color argument to puts"
+color( :white, :blue ) do
+  puts "now everything is white on blue!"
+  color( :green, :black ) { "nesting is supported" }
+end
 
-putsc [WHITE,DARK_GREEN], "foreground and background are specified with an array"
+color( :white, :black, :bold ) { "third parameter to specify :bold or :dim" }
 
-color( WHITE, BLUE )
+== Options:
 
-puts "now everything is white on blue!"
+COLORS = :black, :red, :green, :yellow, :blue, :purple or :magenta,
+:cyan, :white, :default
+    
+ATTRIBUTES = :bold, :bold_off or :dim
 
-color_restore
+== Known Issues:
 
-puts "color-console remembers the original color so it can be restored!"
+On windows cmd console, somtimes background colors bleeds over to the next line.  This
+problem happens when the cmd window's buffer has filled up, then when it scrolls to a
+new line, the previous line's background attribute appears.  The older color-console did
+not exhibit this problem.  Perhapse in a later release color-block could use the older
+code when it detects platform is windows.  Work arounds: clear the buffer
+using the cls command; or increase the buffer size; or avoid background colors.
+
+By design, the ColorStack class which tracks color changes to restore them later only
+supports single-threaded operation (it is a singleton).  If different threads use color blocks
+the resulting restored colors are unpredictable.
 
 == History:
 
-0.1.1 Sep 23, 2003 => Fix, restores color when an exception is thrown within a block 
+0.2.0 Nov 05, 2008 => Removed the Windows specific code in favor of a cross-platform
+solution.  Changed colors from constants to symbols (BLUE to :blue).  After using this
+library in a large Rake build script, removed the putsc method since it wasn't being used.  
+
+0.1.1 Sep 23, 2008 => Fix, restores color when an exception is thrown within a block 
 argument to Windows::ColorConsole#color.  Added examples to demonstrate exception
 handling.
 

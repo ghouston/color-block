@@ -29,65 +29,75 @@
 # Except as contained in this notice, the name(s) of the above copyright holders
 # shall not be used in advertising or otherwise to promote the sale, use or other
 # dealings in this Software without prior written authorization.require 'windows/console'
-require 'windows/console'
+begin
+  require 'Win32/Console/ANSI' if PLATFORM =~ /win32/
+rescue LoadError
+  raise 'You must gem install win32console to use color on Windows'
+end
 
-module Windows::ColorConsole
-  include Windows::Console
-
-  # see also http://msdn.microsoft.com/en-us/library/ms682088(VS.85).aspx Character Attributes
-  # for more information about these codes.
-  BLACK = 0
-  DARK_BLUE = 1
-  DARK_GREEN = 2
-  DARK_CYAN = 3
-  DARK_RED = 4
-  DARK_PURPLE = 5
-  DARK_YELLOW = 6
-  WHITE = 7
-  GREY = 8
-  BLUE = 9
-  GREEN = 10
-  CYAN = 11
-  RED = 12
-  PURPLE = 13
-  YELLOW =14
-  BRIGHT_WHITE = 15
-
-  def color( foreground, background = nil )
-    @__color_console_handle ||= GetStdHandle(-11) # i have no idea why -11 is used, need to lookup sometime
-    prior_color = current_color()
-    @__color_console_original ||= prior_color
-    new_color = (background.nil?) ? foreground : foreground + (background * 16)
-    SetConsoleTextAttribute( @__color_console_handle, new_color )
+require 'singleton'
+module ColorBlock
+  class ColorStack
+    include Singleton
+    
+    def initialize
+      @stack = []
+    end
+    
+    def push( code )
+      @stack.push code
+    end
+    
+    def pop
+      code = @stack.pop
+    end
+    
+    def last
+      @stack.last
+    end
+    
+    def reset
+      @stack = []
+    end
+  end
+    
+  COLORS = { :black => 30, :red => 31, :green => 32,
+    :yellow => 33, :blue => 34, :purple => 35, :magenta => 35, :cyan => 36,
+    :white => 37, :default => 39 }
+    
+  ATTRIBUTES = { :bold => 1, :bold_off => 22, :dim => 22 }
+  
+  def color( foreground, background = nil, attribute = :bold )
+    if background.nil? then
+      code = "\033[#{ATTRIBUTES[attribute]};#{COLORS[foreground]}m"
+    else
+      code = "\033[#{ATTRIBUTES[attribute]};#{COLORS[foreground]};#{COLORS[background]+10}m"
+    end
+    ColorStack.instance.push code
+    print "\33[0;40m"
+    print code
     if block_given? then
       begin
         yield
       rescue
-        SetConsoleTextAttribute( @__color_console_handle, prior_color )
+        ColorStack.instance.pop
+        color_restore
+        #color_reset
         raise # rethrow the exception
       end
-      SetConsoleTextAttribute( @__color_console_handle, prior_color )
+      ColorStack.instance.pop
+      color_restore
+      #color_reset
     end
   end
 
   def color_restore
-    if block_given? then
-      color( @__color_console_original, &block )
-    else
-      color( @__color_console_original )
-    end
+    code = ColorStack.instance.last
+    print (code.nil?) ? "\33[0m" : code
   end
   
-  def current_color
-    @__color_console_handle ||= GetStdHandle(-11) # i have no idea why -11 is used, need to lookup sometime
-    lpBuffer = ' ' * 22
-    GetConsoleScreenBufferInfo( @__color_console_handle, lpBuffer )
-    # see http://msdn.microsoft.com/en-us/library/ms682093(VS.85).aspx
-    # to understand buffer info elements
-    return lpBuffer.unpack("SSSSSssssSS")[4]
-  end
-  
-  def putsc( newcolor, message )
-    color( *newcolor ) { puts message }
+  def color_reset
+    ColorStack.instance.reset
+    print "\33[0;40m"
   end
 end

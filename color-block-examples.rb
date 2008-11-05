@@ -1,46 +1,37 @@
-require 'color-console'
+require 'color-block'
+include ColorBlock
 
-include Windows::ColorConsole
-
-color( WHITE, BLUE )
-puts "is this white on blue?"
-
-putsc GREEN, "is this green?"
-puts "is this white on blue again?"
-
-putsc [WHITE,DARK_GREEN], "is this white on dark green?"
-
-color( BLUE )
-puts "is this blue?"
-
-color( RED )
-puts "is this red?"
-
-color( CYAN ) {
-  puts "is this cyan?"
-  puts "(this is inside a block)"
+color( :white, :blue ) { puts "is this white on blue?" }
+color( :green ) { puts  "is this green?" }
+color( :white, :green, :dim ) { puts "is this white on dark green?" }
+color( :blue ) { puts "is this blue?" }
+color( :red ) { 
+  puts "is this red?"
+  color( :cyan ) {
+    puts "  is this cyan?"
+    puts "  (this is inside a nested block)"
+  }
+  puts "is this red again?"
 }
-puts "is this red again?"
 
-color_restore()
 puts "is this the original color?"
 
 puts "testing exception handling and nested blocks..."
-color( CYAN ) {
+color( :cyan ) {
   puts "is this cyan?"
-  color( GREEN ) {
-    puts "is this green?"
+  color( :green ) {
+    puts "  is this green?"
     begin
-      color( RED ) {
-        puts "is this red?"
-        puts "raising an exception..."
-        raise "test exception"
+      color( :red ) {
+        puts "    is this red?"
+        puts "    raising an exception..."
+        raise "    test exception"
       }
     rescue
-      puts "exception caught."
-      puts "is this green again?" 
+      puts "  exception caught."
+      puts "  is this green again?" 
     end
-    puts "was the exception caught?"
+    puts "  was the exception caught?"
   }
   puts "is this cyan again?"
 }
