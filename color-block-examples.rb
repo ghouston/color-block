@@ -1,37 +1,38 @@
 require 'color-block'
 include ColorBlock
 
-color( :white, :blue ) { puts "is this white on blue?" }
-color( :green ) { puts  "is this green?" }
-color( :white, :green, :dim ) { puts "is this white on dark green?" }
-color( :blue ) { puts "is this blue?" }
+color( :white, :blue ) { puts "white on blue?" }
+color( :green ) { puts  "green?" }
+color( :white, :green, :dim ) { puts "white on dark green?" }
+color( :blue ) { puts "blue?" }
 color( :red ) { 
-  puts "is this red?"
+  puts "red?"
   color( :cyan ) {
-    puts "  is this cyan?"
+    puts "  cyan?"
     puts "  (this is inside a nested block)"
   }
-  puts "is this red again?"
+  puts "red again?"
 }
 
-puts "is this the original color?"
-
+puts "all blocks are now closed. is this the original color?"
+puts
 puts "testing exception handling and nested blocks..."
 color( :cyan ) {
-  puts "is this cyan?"
+  puts "cyan?"
   color( :green ) {
-    puts "  is this green?"
+    puts "  green?"
     begin
       color( :red ) {
-        puts "    is this red?"
+        puts "    red?"
         puts "    raising an exception..."
         raise "    test exception"
       }
     rescue
-      puts "  exception caught."
-      puts "  is this green again?" 
+      puts "  catching exception."
+      puts "  green again?" 
     end
+    puts "  at this point you should have seen a message \"catching exception.\""
     puts "  was the exception caught?"
   }
-  puts "is this cyan again?"
+  puts "cyan again?"
 }

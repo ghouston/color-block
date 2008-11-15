@@ -32,7 +32,7 @@
 begin
   require 'Win32/Console/ANSI' if PLATFORM =~ /win32/
 rescue LoadError
-  raise 'You must gem install win32console to use color on Windows'
+  raise 'You must gem install win32console to use color on the Microsoft Windows platform'
 end
 
 require 'singleton'
@@ -82,12 +82,10 @@ module ColorBlock
       rescue
         ColorStack.instance.pop
         color_restore
-        #color_reset
         raise # rethrow the exception
       end
       ColorStack.instance.pop
       color_restore
-      #color_reset
     end
   end
 
