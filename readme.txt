@@ -5,7 +5,18 @@ I wanted to color the output of Rake.  The problem is I dont have direct access 
 strings contained in rake tasks.  The solution is to wrap code in a block that colors the
 output of everything inside the block.
 
-Version:: 0.2.0
+Version:: 0.3.0
+
+== Installation:
+
+On Unix:
+
+  $ gem sources -a http://gems.github.com (you only have to do this once)
+  $ sudo gem install ghouston-color-block
+
+On Windows:
+  > gem sources -a http://gems.github.com (you only have to do this once)
+  > gem install ghouston-color-block
 
 == LICENSE:
 
